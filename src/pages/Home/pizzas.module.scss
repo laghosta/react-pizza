@@ -1,0 +1,29 @@
+.pizza_list{
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto;
+  grid-column-gap: 20px;
+  justify-content: center;
+  margin-top: 40px;
+  gap:30px;
+}
+@media (max-width:1520px ) {
+  .pizza_list{
+    grid-template-columns: repeat(3, 1fr);
+
+  }
+}
+@media (max-width:1100px ) {
+  .pizza_list{
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width:720px ) {
+  .pizza_list{
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+.pizza__block{
+  padding: 0 60px;
+}

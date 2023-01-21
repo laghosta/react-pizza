@@ -1,0 +1,131 @@
+.pizza{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1;
+  margin-bottom: 40px;
+  height: 455px;
+  h4{
+    text-align: center;
+    margin-top: 10px;
+    font-size: 20px;
+    max-width: 100%;
+    max-height:30px ;
+    overflow-y: hidden;
+    word-wrap: anywhere;
+  }
+  &__dough{
+    margin-top: 10px;
+    width: 100%;
+    display: flex;
+    flex: 1 1;
+    font-size: 14px;
+    align-items: center;
+    justify-content: space-between;
+    list-style: none;
+    padding: 5px 10px;
+    padding-top: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+
+    background-color: #f3f3f3;
+    li{
+      text-align: center;
+      padding: 5px 5px;
+      width: 100%;
+      border-radius: 5px;
+      user-select: none;
+      cursor: pointer;
+    }
+  }
+  &__size{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 100%;
+    list-style: none;
+    padding: 5px 10px;
+    background-color: #f3f3f3;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+
+    li{
+      text-align: center;
+      width: 100%;
+      padding: 5px 10px;
+      border-radius: 5px;
+      user-select: none;
+      cursor: pointer;
+    }
+
+  }
+  &__bottom{
+    width: 100%;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  &__price{
+    margin-top: 10px;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  &__addBtn{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: "Nunito", sans-serif;
+    background-color: transparent;
+    border-radius: 20px;
+    border: 1px solid #fe5f1e;
+    padding: 10px 15px;
+    transition: .1s linear;
+    cursor: pointer;
+    span{
+      font-size: 14px;
+      font-weight: 700;
+      color: #fe5f1e;
+    }
+    svg{
+      path{
+      fill: #fe5f1e;
+      }
+    }
+    i{
+      color: white;
+      background-color: #fe5f1e;
+      border-radius: 50%;
+      font-size: 13px;
+      min-width: 20px;
+      min-height: 20px;
+      font-style: normal;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    &:hover{
+      background-color: #e8e8e8;
+      span{
+        color: white;
+      }
+      i{
+        background-color: #fff;
+        color: #e8e8e8;
+      }
+      svg{
+        path{
+          fill: #fff;
+        }
+      }
+    }
+    &:active{
+      transform: scale(98%);
+    }
+  }
+}
+.active{
+  background-color: #fff;
+  box-shadow: 0px 2px 3px rgba(0,0,0,0.1);
+}
