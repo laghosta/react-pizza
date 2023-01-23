@@ -1,21 +1,19 @@
 import React from 'react';
 import styles from './sort.module.scss';
+import {useAppDispatch, useAppSelector} from "../../redux/hooks";
+import {SetSortBy} from "../../redux/slices/filterSlice";
 
-interface Props {
-    sortBy: number;
 
-    setSortBy(arg: number): any
 
-    sort: string[]
-}
-
-const Sort = ({sortBy, setSortBy, sort}: Props) => {
+const Sort = () => {
     const [sortOpened, setSortOpened] = React.useState(false)
-
+    const dispatch = useAppDispatch()
+    const sortBy = useAppSelector(state => state.filter.sortBy)
     const setSortSelected = (id: number) =>{
-        setSortBy(id)
+        dispatch(SetSortBy(id))
         setSortOpened(false)
     }
+    const sort: string[] = ['популярности (DESC)', 'популярности (ASC)', 'цене (DESC)', 'цене (ASC)', 'алфавиту (DESC)', 'алфавиту (ASC)']
 
     return (
         <div className={styles.sort}>

@@ -1,13 +1,15 @@
 import React from 'react';
 import styles from './header.module.scss'
 import {Link} from "react-router-dom";
-import {SearchContext} from '../../App'
+import {SetSearchValue} from "../../redux/slices/filterSlice";
+import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 
 const Header = () => {
-    const {searchValue, setSearchValue} = React.useContext(SearchContext)
+    const dispatch = useAppDispatch()
+    const searchValue = useAppSelector(state => state.filter.searchValue)
     function sortValidation (){
-        if(setSearchValue && searchValue){
-            setSearchValue("")
+        if(dispatch(SetSearchValue) && searchValue){
+            dispatch(SetSearchValue(""))
         }
     }
     return (
@@ -29,7 +31,7 @@ const Header = () => {
                               strokeMiterlimit="10" strokeWidth="2" x1="27" x2="20.366" y1="27" y2="20.366"></line>
                     </svg>
                     <input value={searchValue}
-                           onChange={(e) => setSearchValue!(e.target.value)}
+                           onChange={(e) => dispatch(SetSearchValue((e.target.value)))!}
                            type="text"
                            placeholder={"Поиск пиццы"}/>
                     {
