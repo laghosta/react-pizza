@@ -1,15 +1,13 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import styles from './pizzas.module.scss'
 import PizzaItem from "../../components/PizzaItem/PizzaItem";
 import Skeleton from "../../components/PizzaItem/Skeleton";
 import axios from "axios";
 import ContentTop from "../../components/ContentTop/ContentTop";
 import Pagination from "../../components/Pagination/Pagination";
-import {SearchContext} from "../../App";
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
-import {SetCurrentPage, SetSelectedCategoryIndex} from '../../redux/slices/filterSlice'
-import {useDispatch} from "react-redux";
-
+import {SetCurrentPage} from '../../redux/slices/filterSlice'
+import PizzasNotFound from "../../components/PizzasNotFound/PizzaNotFound";
 interface Pizza {
     id: number;
     title: string;
@@ -39,6 +37,7 @@ const Home = () => {
     const SearchValue = useAppSelector(state => state.filter.searchValue)
     const CurrentPage = useAppSelector(state => state.filter.currentPage)
     const dispatch = useAppDispatch()
+    const pizzasList = useRef<HTMLUListElement>(null)
     React.useEffect(() => {
         axios.get(`https://63618928af66cc87dc2dd4a5.mockapi.io/pizzas?page=${CurrentPage}&limit=4&${CategoryIndex !== 0 
             ? `&category=${CategoryIndex}&`
@@ -49,24 +48,34 @@ const Home = () => {
             })
     }, [CategoryIndex, SortBy, CurrentPage])
     window.scrollTo(0, 0)
+
+    function PizzaRender(){
+        if(pizzas.filter((pizza:Pizza)=>pizza.title.toLowerCase()
+            .includes(SearchValue)).length){
+            pizzasList.current?.classList.add(styles.pizza_list)
+            return  pizzas.filter((pizza:Pizza)=>pizza.title.toLowerCase()
+                .includes(SearchValue)).map((el:Pizza, id)=>
+                <PizzaItem
+                    key={id}
+                    pizza = {el}
+                />)
+        }
+        else{
+            pizzasList.current?.classList.remove(styles.pizza_list)
+            return <PizzasNotFound/>
+        }
+    }
     return (
         <div className={styles.pizza__block}>
             <ContentTop/>
             <h1>
                 Все пиццы
             </h1>
-            <ul className={styles.pizza_list}>
+            <ul ref={pizzasList} className={styles.pizza_list}>
                 {
                     isLoading
                         ? [...new Array(4)].map((el, id) => <Skeleton key={id}/>)
-                        : pizzas.filter((pizza:Pizza)=>pizza.title.toLowerCase()
-                                .includes(SearchValue))
-                                .map((el:Pizza, id)=>
-                            <PizzaItem
-                                key={id}
-                                pizza = {el}
-                            /> )
-
+                        : PizzaRender()
                 }
             </ul>
             <Pagination onChangePage={(number)=>dispatch(SetCurrentPage(number))}/>

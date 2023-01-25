@@ -1,17 +1,31 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import styles from './header.module.scss'
 import {Link} from "react-router-dom";
 import {SetSearchValue} from "../../redux/slices/filterSlice";
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
-
+import debounce from 'lodash.debounce'
 const Header = () => {
     const dispatch = useAppDispatch()
+    const [value, setValue] = React.useState<string>('');
     const searchValue = useAppSelector(state => state.filter.searchValue)
+    const inputRef = useRef<HTMLInputElement>(null)
     function sortValidation (){
-        if(dispatch(SetSearchValue) && searchValue){
+        if(searchValue){
+            setValue("")
             dispatch(SetSearchValue(""))
+            inputRef.current?.focus()
         }
     }
+    const updateSearchValue = React.useCallback(
+        debounce((str: string) => {
+            dispatch(SetSearchValue(str));
+        }, 300),
+        [],
+    );
+    const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setValue(e.target.value);
+        updateSearchValue(value);
+    };
     return (
         <div className={styles.header}>
             <div className={styles.container}>
@@ -30,10 +44,12 @@ const Header = () => {
                         <line fill="none" id="XMLID_44_" stroke="grey" strokeLinecap="round" strokeLinejoin="round"
                               strokeMiterlimit="10" strokeWidth="2" x1="27" x2="20.366" y1="27" y2="20.366"></line>
                     </svg>
-                    <input value={searchValue}
-                           onChange={(e) => dispatch(SetSearchValue((e.target.value)))!}
-                           type="text"
-                           placeholder={"Поиск пиццы"}/>
+                    <input  ref={inputRef}
+                            value={value}
+                            onChange={onChangeInput}
+                            type="text"
+                            placeholder={"Поиск пиццы"}
+                    />
                     {
                         searchValue &&
                         <svg onClick={sortValidation}
