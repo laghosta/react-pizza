@@ -17,14 +17,21 @@ const Header = () => {
         }
     }
     const updateSearchValue = React.useCallback(
-        debounce((str: string) => {
-            dispatch(SetSearchValue(str));
+        debounce((value: string) => {
+            dispatch(SetSearchValue(value));
         }, 300),
         [],
     );
     const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setValue(e.target.value);
-        updateSearchValue(value);
+        if (e.target.value.trim().length === 0){
+            setValue("");
+            updateSearchValue("");
+        }
+        else{
+            setValue(e.target.value);
+            updateSearchValue(value);
+        }
+
     };
     return (
         <div className={styles.header}>

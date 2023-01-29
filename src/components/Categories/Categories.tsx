@@ -6,7 +6,7 @@ import {SetSelectedCategoryIndex} from "../../redux/slices/filterSlice";
 const Categories = () => {
     const categories:string[]=["Все", "Мясные", "Вегетарианские", "Гриль", "Острые", "Закрытые"]
     const dispatch = useAppDispatch()
-    const selectedCategoryIndex = useAppSelector(state => state.filter.selectedCategoryIndex)
+    const selectedCategoryIndex = useAppSelector(state => state.filter.CategoryIndex)
     return (
         <div className={styles.categories}>
             <ul className={styles.categories__list}>

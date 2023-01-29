@@ -2,21 +2,43 @@ import React from 'react';
 import styles from './sort.module.scss';
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 import {SetSortBy} from "../../redux/slices/filterSlice";
+import {TSort, SortPropertyEnum} from "../../redux/types";
 
-
-
+interface PopupClick{
+    path:Node[]
+}
+export const sortList = [
+    {name : 'популярности (DESC)', sortProperty : SortPropertyEnum.RATING_DESC},
+    {name : 'популярности (ASC)', sortProperty : SortPropertyEnum.RATING_ASC},
+    {name : 'цене (DESC)', sortProperty : SortPropertyEnum.PRICE_DESC},
+    {name : 'цене (ASC)', sortProperty : SortPropertyEnum.PRICE_ASC},
+    {name : 'алфавиту (DESC)', sortProperty : SortPropertyEnum.TITLE_DESC},
+    {name : 'алфавиту (ASC)', sortProperty : SortPropertyEnum.TITLE_ASC}
+]
 const Sort = () => {
     const [sortOpened, setSortOpened] = React.useState(false)
+    const sortRef = React.useRef(null)
     const dispatch = useAppDispatch()
     const sortBy = useAppSelector(state => state.filter.sortBy)
-    const setSortSelected = (id: number) =>{
-        dispatch(SetSortBy(id))
+    const setSortSelected = (obj:TSort) =>{
+        dispatch(SetSortBy(obj))
         setSortOpened(false)
     }
-    const sort: string[] = ['популярности (DESC)', 'популярности (ASC)', 'цене (DESC)', 'цене (ASC)', 'алфавиту (DESC)', 'алфавиту (ASC)']
+    React.useEffect(()=>{
+       const handleClickOutside = (event:MouseEvent) =>{
+           const _event = event as unknown as PopupClick
+           if (sortRef.current && !_event.path.includes(sortRef.current)) {
+               setSortOpened(false);
+           }
+       }
+        document.body.addEventListener("click", handleClickOutside)
+        return () => document.body.removeEventListener('click', handleClickOutside);
+
+    },[])
+
 
     return (
-        <div className={styles.sort}>
+        <div ref={sortRef} className={styles.sort}>
             <div className={styles.sort__label}>
                 <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -24,16 +46,16 @@ const Sort = () => {
                         fill="#2C2C2C"></path>
                 </svg>
                 <b>Сортировка по: </b>
-                <span onClick={() => setSortOpened(!sortOpened)}>{sort[sortBy]}</span>
+                <span onClick={() => setSortOpened(!sortOpened)}>{sortBy.name}</span>
             </div>
             <div className={styles.sort__popup}>
                 <ul style={{display: sortOpened ? "block" : "none"}}
                     className={styles.sort__popupList}>
                     {
-                        sort.map((el, id) =>
+                        sortList.map((el, id) =>
                             <li key={id}
-                                className={sortBy === id ? styles.active : ""}
-                                onClick={() => setSortSelected(id)}>{sort[id]}
+                                className={ sortBy.sortProperty === el.sortProperty ? styles.active : ''}
+                                onClick={() => setSortSelected(el)}>{el.name}
                             </li>
                         )
                     }

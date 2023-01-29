@@ -6,8 +6,10 @@ import axios from "axios";
 import ContentTop from "../../components/ContentTop/ContentTop";
 import Pagination from "../../components/Pagination/Pagination";
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
-import {SetCurrentPage} from '../../redux/slices/filterSlice'
+import {SetCurrentPage, SetFilters} from '../../redux/slices/filterSlice'
 import PizzasNotFound from "../../components/PizzasNotFound/PizzaNotFound";
+import {useNavigate} from "react-router-dom";
+import {sortList} from "../../components/Sort/Sort";
 interface Pizza {
     id: number;
     title: string;
@@ -19,36 +21,53 @@ interface Pizza {
     rating: number
 }
 
-
-
 const Home = () => {
+    const nav = useNavigate()
+    const dispatch = useAppDispatch()
+    let qs = require("qs")
     const [pizzas, setPizzas] = React.useState([])
     const [isLoading, setIsLoading] = React.useState(true)
-    const sortLinkList = [
-        'sortBy=rating&order=desc',
-        'sortBy=rating&order=asc',
-        'sortBy=price&order=desc',
-        'sortBy=price&order=asc',
-        'sortBy=title&order=desc',
-        'sortBy=title&order=asc',
-    ]
-    const CategoryIndex = useAppSelector(state => state.filter.selectedCategoryIndex)
+    const CategoryIndex = useAppSelector(state => state.filter.CategoryIndex)
     const SortBy = useAppSelector(state => state.filter.sortBy)
     const SearchValue = useAppSelector(state => state.filter.searchValue)
-    const CurrentPage = useAppSelector(state => state.filter.currentPage)
-    const dispatch = useAppDispatch()
+    const CurrentPage = useAppSelector(state => state.filter.CurrentPage)
     const pizzasList = useRef<HTMLUListElement>(null)
+
+    React.useEffect(()=>{
+        if(window.location.search){
+            const params = qs.parse(window.location.search.substring(1))
+            const sortBy = sortList.find((obj)=> obj.sortProperty === params.sortProperty )
+            dispatch(SetCurrentPage(params.CurrentPage))
+            console.log(params.sortProperty)
+            console.log(params.CategoryIndex);
+            dispatch(SetFilters({
+                ...params,
+                sortBy
+            }))
+        }
+        else{
+            console.log("sauntre")
+        }
+    },[])
+
     React.useEffect(() => {
         axios.get(`https://63618928af66cc87dc2dd4a5.mockapi.io/pizzas?page=${CurrentPage}&limit=4&${CategoryIndex !== 0 
             ? `&category=${CategoryIndex}&`
-            : "&"}${sortLinkList[SortBy]}`)
+            : "&"}sortBy=${SortBy.sortProperty[0] === "-" ? SortBy.sortProperty.substring(1) : SortBy.sortProperty }&order=${SortBy.sortProperty[0] === "-" ? "desc" : "asc"}`)
             .then(el => {
                 setPizzas(el.data)
                 setIsLoading(false)
             })
     }, [CategoryIndex, SortBy, CurrentPage])
     window.scrollTo(0, 0)
-
+    React.useEffect(()=>{
+        const queryStr = qs.stringify({
+            sortProperty: SortBy.sortProperty,
+            CategoryIndex,
+            CurrentPage,
+        })
+        nav(`?${queryStr}`)
+    }, [CategoryIndex, SortBy, CurrentPage, window.location.search])
     function PizzaRender(){
         if(pizzas.filter((pizza:Pizza)=>pizza.title.toLowerCase()
             .includes(SearchValue)).length){
@@ -78,7 +97,7 @@ const Home = () => {
                         : PizzaRender()
                 }
             </ul>
-            <Pagination onChangePage={(number)=>dispatch(SetCurrentPage(number))}/>
+            <Pagination/>
         </div>
     );
 };
