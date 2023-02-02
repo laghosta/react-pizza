@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {SortPropertyEnum, TSort, IInitialState} from '../types'
+import {SortPropertyEnum, TSort, IInitialFilterState} from '../types'
 
 export interface FilterSliceState {
     searchValue: string;
@@ -8,7 +8,7 @@ export interface FilterSliceState {
     sortBy: TSort;
 }
 
-const initialState:IInitialState = {
+const initialState:IInitialFilterState = {
     searchValue: "",
     CategoryIndex: 0,
     CurrentPage: 1,

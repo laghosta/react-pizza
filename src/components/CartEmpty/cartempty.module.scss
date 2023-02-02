@@ -1,0 +1,31 @@
+.cartEmpty{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 36px;
+  color: #B6B6B6;
+  img{
+    margin-top: 50px;
+    width: 400px;
+    height: 400px;
+  }
+  .backBtn{
+    text-decoration: none;
+    margin-top: 30px;
+    font-size: 18px;
+    color: white;
+    padding: 15px 30px;
+    background-color: black;
+    border-radius: 30px;
+    user-select: none;
+    transition: .1s linear;
+    &:hover{
+      background-color: #282828FF;
+      transform: scale(102%);
+    }
+    &:active{
+      transform: translateY(3px);
+    }
+  }
+}

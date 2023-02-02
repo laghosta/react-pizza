@@ -4,11 +4,15 @@ import {Link} from "react-router-dom";
 import {SetSearchValue} from "../../redux/slices/filterSlice";
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 import debounce from 'lodash.debounce'
+import {calcCartPizzasCount, calcCartPizzasPrice} from "../../redux/slices/cartSlice";
 const Header = () => {
     const dispatch = useAppDispatch()
     const [value, setValue] = React.useState<string>('');
     const searchValue = useAppSelector(state => state.filter.searchValue)
     const inputRef = useRef<HTMLInputElement>(null)
+    const pizzasCount = useAppSelector(state=> state.cart.pizzasCount)
+    const pizzasPrice = useAppSelector(state=> state.cart.sum)
+
     function sortValidation (){
         if(searchValue){
             setValue("")
@@ -36,7 +40,7 @@ const Header = () => {
     return (
         <div className={styles.header}>
             <div className={styles.container}>
-                <Link to='/' className={styles.header__logo}>
+                <Link to='/'  className={styles.header__logo}>
                     <img width="38" src="/img/pizza-logo.svg" alt="Pizza logo"/>
                     <div>
                         <h1>React Pizza</h1>
@@ -69,8 +73,8 @@ const Header = () => {
 
                 </div>
                 <div>
-                    <Link to='/cart' className={styles.header__cartBtn}>
-                        <span>520 ₴</span>
+                    <Link  to='/cart' className={styles.header__cartBtn}>
+                        <span>{pizzasPrice} ₴</span>
                         <div className={styles.delimiter}></div>
                         <svg
                             width="18"
@@ -101,7 +105,7 @@ const Header = () => {
                                 strokeLinejoin="round"
                             />
                         </svg>
-                        <span>3</span>
+                        <span>{pizzasCount}</span>
                     </Link>
                 </div>
             </div>

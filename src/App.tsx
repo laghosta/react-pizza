@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Suspense} from 'react';
 import './App.css';
 import {
     Routes,
@@ -22,8 +22,16 @@ function App() {
             <div className="wrapper">
                 <Header/>
                 <Routes>
-                    <Route path='/' element={<Home/>}/>
-                    <Route path='/cart' element={<Cart />}/>
+                        <Route path='/' element={
+                            <Suspense fallback={<div>Идёт загрузка главной страницы...</div>}>
+                                <Home/>
+                            </Suspense>
+                        }/>
+                        <Route path='/cart' element={
+                            <Suspense fallback={<div>Идёт загрузка корзины...</div>}>
+                                <Cart/>
+                            </Suspense>
+                        }/>
                     <Route path='*' element={<NotFound />}/>
                 </Routes>
             </div>

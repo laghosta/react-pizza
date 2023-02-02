@@ -9,7 +9,8 @@
     justify-content: space-between;
   }
   &__search{
-    margin-left: -300px;
+    position: absolute;
+    left: 35%;
     display: flex;
     align-items: center;
     width: 400px;

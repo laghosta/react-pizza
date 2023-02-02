@@ -2,7 +2,6 @@ import React, {useRef} from 'react';
 import styles from './pizzas.module.scss'
 import PizzaItem from "../../components/PizzaItem/PizzaItem";
 import Skeleton from "../../components/PizzaItem/Skeleton";
-import axios from "axios";
 import ContentTop from "../../components/ContentTop/ContentTop";
 import Pagination from "../../components/Pagination/Pagination";
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
@@ -10,80 +9,82 @@ import {SetCurrentPage, SetFilters} from '../../redux/slices/filterSlice'
 import PizzasNotFound from "../../components/PizzasNotFound/PizzaNotFound";
 import {useNavigate} from "react-router-dom";
 import {sortList} from "../../components/Sort/Sort";
-interface Pizza {
-    id: number;
-    title: string;
-    image: string;
-    types: number[];
-    sizes: number[];
-    price: number;
-    category: number;
-    rating: number
-}
+import {calcCartPizzasCount, calcCartPizzasPrice} from "../../redux/slices/cartSlice";
+import {Pizza} from "../../redux/types";
+import fetchPizzas from "../../redux/asyncAction";
+import {setItems} from "../../redux/slices/pizzaSlice";
+let qs = require("qs")
+
 
 const Home = () => {
     const nav = useNavigate()
     const dispatch = useAppDispatch()
-    let qs = require("qs")
-    const [pizzas, setPizzas] = React.useState([])
-    const [isLoading, setIsLoading] = React.useState(true)
+    const isSearch = React.useRef(false)
+    const isMounted = React.useRef(false)
     const CategoryIndex = useAppSelector(state => state.filter.CategoryIndex)
     const SortBy = useAppSelector(state => state.filter.sortBy)
     const SearchValue = useAppSelector(state => state.filter.searchValue)
     const CurrentPage = useAppSelector(state => state.filter.CurrentPage)
     const pizzasList = useRef<HTMLUListElement>(null)
+    const cartPizzas = useAppSelector(state => state.cart.cartValue)
+    const pizzasCount = useAppSelector(state => state.cart.pizzasCount)
+    const pizzas = useAppSelector(state => state.pizzas.pizzas)
+    const isLoading  = useAppSelector(state=> state.pizzas.isLoading)
 
     React.useEffect(()=>{
-        if(window.location.search){
+        fetchPizzas(
+            {
+                CategoryIndex,
+                SortBy,
+                CurrentPage
+            }).then(res =>dispatch(setItems(res)))
+    },[CategoryIndex, SortBy, CurrentPage])
+
+    React.useEffect(() => {
+        if (window.location.search) {
             const params = qs.parse(window.location.search.substring(1))
-            const sortBy = sortList.find((obj)=> obj.sortProperty === params.sortProperty )
+            const sortBy = sortList.find((obj) => obj.sortProperty === params.sortProperty)
             dispatch(SetCurrentPage(params.CurrentPage))
-            console.log(params.sortProperty)
-            console.log(params.CategoryIndex);
             dispatch(SetFilters({
                 ...params,
                 sortBy
             }))
+            isSearch.current = true
         }
-        else{
-            console.log("sauntre")
-        }
-    },[])
+    }, [])
+    React.useEffect(() => {
+        dispatch(calcCartPizzasCount())
+        dispatch(calcCartPizzasPrice())
+    }, [cartPizzas, pizzasCount])
 
     React.useEffect(() => {
-        axios.get(`https://63618928af66cc87dc2dd4a5.mockapi.io/pizzas?page=${CurrentPage}&limit=4&${CategoryIndex !== 0 
-            ? `&category=${CategoryIndex}&`
-            : "&"}sortBy=${SortBy.sortProperty[0] === "-" ? SortBy.sortProperty.substring(1) : SortBy.sortProperty }&order=${SortBy.sortProperty[0] === "-" ? "desc" : "asc"}`)
-            .then(el => {
-                setPizzas(el.data)
-                setIsLoading(false)
+        if (isMounted.current) {
+            const queryStr = qs.stringify({
+                sortProperty: SortBy.sortProperty,
+                CategoryIndex,
+                CurrentPage,
             })
-    }, [CategoryIndex, SortBy, CurrentPage])
-    window.scrollTo(0, 0)
-    React.useEffect(()=>{
-        const queryStr = qs.stringify({
-            sortProperty: SortBy.sortProperty,
-            CategoryIndex,
-            CurrentPage,
-        })
-        nav(`?${queryStr}`)
+            nav(`?${queryStr}`)
+        }
+        isMounted.current = true
     }, [CategoryIndex, SortBy, CurrentPage, window.location.search])
-    function PizzaRender(){
-        if(pizzas.filter((pizza:Pizza)=>pizza.title.toLowerCase()
-            .includes(SearchValue)).length){
+
+    function PizzaRender() {
+        if (pizzas.filter((pizza: Pizza) => pizza.title.toLowerCase()
+            .includes(SearchValue)).length) {
             pizzasList.current?.classList.add(styles.pizza_list)
-            return  pizzas.filter((pizza:Pizza)=>pizza.title.toLowerCase()
-                .includes(SearchValue)).map((el:Pizza, id)=>
+            return pizzas.filter((pizza: Pizza) => pizza.title.toLowerCase()
+                .includes(SearchValue)).map((el: Pizza, id) =>
                 <PizzaItem
                     key={id}
-                    pizza = {el}
+                    pizza={el}
                 />)
-        }
-        else{
+        } else {
             pizzasList.current?.classList.remove(styles.pizza_list)
             return <PizzasNotFound/>
         }
     }
+
     return (
         <div className={styles.pizza__block}>
             <ContentTop/>
@@ -94,7 +95,7 @@ const Home = () => {
                 {
                     isLoading
                         ? [...new Array(4)].map((el, id) => <Skeleton key={id}/>)
-                        : PizzaRender()
+                        :  PizzaRender()
                 }
             </ul>
             <Pagination/>
